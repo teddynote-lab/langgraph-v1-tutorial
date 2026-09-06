@@ -1,13 +1,14 @@
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 
 # FastMCP 서버 초기화 및 구성
+# (FastMCP 4.x: `from fastmcp import FastMCP` — 과거의 `mcp.server.fastmcp` 경로는 MCP SDK 2.x에서 제거되었습니다)
 mcp = FastMCP(
     "Weather",  # MCP 서버 이름
     instructions="날씨 정보를 제공하는 어시스턴트입니다. 주어진 위치의 날씨에 대한 질문에 답변할 수 있습니다.",
 )
 
 
-@mcp.tool()
+@mcp.tool
 async def get_weather(location: str) -> str:
     """지정된 위치의 현재 날씨 정보를 가져옵니다.
 
@@ -26,7 +27,7 @@ async def get_weather(location: str) -> str:
 
 
 if __name__ == "__main__":
-    # stdio 전송 방식으로 MCP 서버를 시작합니다
+    # stdio 전송 방식으로 MCP 서버를 시작합니다 (기본값)
     # stdio 전송은 표준 입출력 스트림을 통해 클라이언트와 통신하며,
     # 로컬 개발 및 테스트에 적합합니다
     mcp.run(transport="stdio")
