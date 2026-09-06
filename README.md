@@ -2,12 +2,15 @@
 
 LangGraph V1의 핵심 개념과 실전 활용 방법을 다루는 한국어 Jupyter Notebook 튜토리얼 모음입니다. 초보자부터 중급 개발자까지 LangGraph를 활용한 AI 에이전트 개발 방법을 단계별로 학습할 수 있습니다.
 
+모든 실습은 [LangChain 공식 문서](https://docs.langchain.com/) (`https://docs.langchain.com/llms.txt`) 의 최신 패턴을 기준으로 작성되었습니다.
+
 ## 목차
 
 1. [환경 설정](#환경-설정)
-2. [튜토리얼 목록](#튜토리얼-목록)
-3. [시작하기](#시작하기)
-4. [참고 자료](#참고-자료)
+2. [사용 라이브러리 버전](#사용-라이브러리-버전)
+3. [튜토리얼 목록](#튜토리얼-목록)
+4. [시작하기](#시작하기)
+5. [참고 자료](#참고-자료)
 
 ## 환경 설정
 
@@ -25,30 +28,25 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-### 2. 가상 환경 생성 및 활성화
+### 2. 의존성 설치
+
+`pyproject.toml` / `uv.lock` 에 고정된 버전을 그대로 설치합니다. (가상 환경은 `.venv` 에 자동 생성됩니다.)
 
 ```bash
-# 가상 환경 생성
-uv venv
+uv sync
+```
 
-# 가상 환경 활성화 (macOS/Linux)
+가상 환경을 직접 활성화하려면:
+
+```bash
+# macOS/Linux
 source .venv/bin/activate
 
-# 가상 환경 활성화 (Windows)
+# Windows
 .venv\Scripts\activate
 ```
 
-### 3. 의존성 설치
-
-```bash
-# pyproject.toml 기반 설치
-uv sync
-
-# 또는 직접 패키지 설치
-uv add install langchain langchain-openai langchain-anthropic langchain-community langgraph python-dotenv
-```
-
-### 4. 환경 변수 설정
+### 3. 환경 변수 설정
 
 `.env.example` 파일을 `.env`로 복사하고 API 키를 설정합니다:
 
@@ -58,163 +56,139 @@ cp .env.example .env
 
 `.env` 파일 내용:
 ```
-OPENAI_API_KEY=your-openai-api-key-here
-ANTHROPIC_API_KEY=your-anthropic-api-key-here
+OPENAI_API_KEY=
+ANTHROPIC_API_KEY=
+
+LANGSMITH_API_KEY=
+LANGSMITH_TRACING=true
+LANGSMITH_PROJECT=LangGraph-Tutorial
+
+TAVILY_API_KEY=
 ```
+
+### 4. 기본 모델
+
+실습 코드는 기본적으로 Anthropic `claude-sonnet-5` 를 사용합니다. OpenAI 키를 사용하는 경우 `init_chat_model("gpt-5.5")` 또는 `init_chat_model("gpt-5.4-mini")` 등으로 바꿔 실행할 수 있습니다. (Ollama 로컬 모델 예제는 `PART02/Ch02/03-QuickStart-LangGraph-Ollama.ipynb` 를 참고하세요.)
+
+## 사용 라이브러리 버전
+
+| 패키지 | 버전 | 비고 |
+|:---|:---|:---|
+| `langchain` | >= 1.4.0 | `create_agent`, 미들웨어, `langchain.mcp` (MCP 내장 지원) |
+| `langchain-core` | >= 1.6 | 표준 `reasoning_effort` 파라미터, 표준 모델 예외 타입 |
+| `langgraph` | >= 1.2.11 | 이벤트 스트리밍 v3, 노드 단위 오류 핸들러/타임아웃 |
+| `langgraph-checkpoint-postgres` / `-redis` | >= 3.1 / >= 0.5 | 영속 체크포인터 |
+| `langchain-anthropic` / `langchain-openai` | >= 1.7 / >= 1.6 | 모델 통합 |
+| `fastmcp` / `mcp` | >= 4.0 / >= 2.1 | MCP 서버 작성 (FastMCP 4) 및 MCP Python SDK 2.x |
+| `deepagents` | >= 0.7 | Deep Agents |
+| `langchain-teddynote` | >= 0.5.4 | 그래프 시각화, 스트리밍 헬퍼 등 |
+
+> **MCP 안내**: LangChain 1.4부터 MCP 클라이언트가 `langchain.mcp` (`MCPAdapter`) 로 내장되어 기존 `langchain-mcp-adapters` (`MultiServerMCPClient`) 를 대체합니다. MCP Python SDK 2.x 에서는 `mcp.server.fastmcp` 경로가 제거되었으므로 서버는 `from fastmcp import FastMCP` 를 사용합니다. 자세한 내용은 [마이그레이션 가이드](https://docs.langchain.com/oss/python/migrate/langchain-mcp-adapters)를 참고하세요.
 
 ## 튜토리얼 목록
 
-### 기초 개념
+### PART 01. LangGraph 기초
 
-1. **[langgraph-messages.ipynb](langgraph-messages.ipynb)**
-   - 메시지 구조와 타입 (HumanMessage, AIMessage, SystemMessage)
-   - 메시지 히스토리 관리
-   - 대화 컨텍스트 구성
+**Ch01. 그래프 생성하기**
 
-2. **[langgraph-tools.ipynb](langgraph-tools.ipynb)**
-   - Tool 정의와 등록
-   - 함수 기반 Tool 생성
-   - Tool 실행 및 에러 처리
-   - ToolRuntime 활용
+| 노트북 | 내용 |
+|:---|:---|
+| `01-LangGraph-Introduction.ipynb` | LangGraph 소개, 기본 개념 |
+| `01-LangGraph-Models.ipynb` | `init_chat_model`, 모델 파라미터, `reasoning_effort`, 토큰 사용량, 멀티모달 |
+| `01-QuickStart-LangGraph-Tutorial.ipynb` | 챗봇 → 도구 → 메모리 → HITL → 타임트래블 퀵스타트 |
+| `02-LangGraph-Messages.ipynb` | 메시지 타입과 컨텐츠 블록 |
+| `02-QuickStart-LangGraph-Graph-API.ipynb` | Graph API 퀵스타트 |
+| `03-LangGraph-Building-Graphs.ipynb` | StateGraph, 노드/엣지, 조건부 분기, `Command`/`Send` |
 
-3. **[langgraph-structured-output.ipynb](langgraph-structured-output.ipynb)**
-   - Pydantic을 활용한 구조화된 출력
-   - 응답 형식 검증
-   - JSON 스키마 정의
+### PART 02. 에이전트
 
-### 상태 관리
+| 챕터 | 노트북 | 내용 |
+|:---|:---|:---|
+| Ch02. 에이전트 | `01-LangGraph-Agents.ipynb` | `create_agent`, 도구, 미들웨어, 재시도/폴백 |
+| | `02-LangGraph-ChatBot.ipynb` | 대화형 챗봇 구축 |
+| | `02-LangGraph-Tools.ipynb` | `@tool`, `ToolRuntime`, 도구 오류 처리 |
+| | `03-QuickStart-LangGraph-Ollama.ipynb` | Ollama 로컬 모델로 에이전트 실행 |
+| Ch03. Runtime | `04-LangGraph-Runtime.ipynb` | `Runtime` 객체, `context_schema`, Store, Stream writer |
+| Ch04. 구조화된 출력 | `05-LangGraph-Structured-Output.ipynb` | `response_format`, `ToolStrategy`, `ProviderStrategy` |
+| Ch05. Human-in-the-Loop | `02-LangGraph-Human-In-The-Loop.ipynb`, `06-LangGraph-Human-In-the-Loop.ipynb` | `interrupt`, `HumanInTheLoopMiddleware`, `Command(resume=...)` |
 
-4. **[langgraph-short-term-memory.ipynb](langgraph-short-term-memory.ipynb)**
-   - Checkpointer를 활용한 세션 상태 저장
-   - thread_id 기반 대화 관리
-   - InMemorySaver와 PostgresSaver
-   - 메모리 관리 패턴 (trim, delete, summarize)
+### PART 03. 에이전트 확장
 
-5. **[langgraph-long-term-memory.ipynb](langgraph-long-term-memory.ipynb)**
-   - Store를 활용한 영구 데이터 저장
-   - Namespace와 Key 구조
-   - 사용자 선호도 및 학습 데이터 관리
-   - 세션 간 정보 공유
+| 챕터 | 노트북 | 내용 |
+|:---|:---|:---|
+| Ch06. 미들웨어 | `01-LangGraph-Middleware.ipynb` | `before_model`, `after_model`, `wrap_model_call`, `dynamic_prompt`, 내장 미들웨어 |
+| Ch07. 컨텍스트 엔지니어링 | `03-LangGraph-Context-Engineering.ipynb` | Model / Tool / Life-cycle 컨텍스트 |
+| Ch08. 가드레일 | `04-LangGraph-Guardrail.ipynb` | `PIIMiddleware`, 커스텀 가드레일 |
+| Ch09. 메모리 추가하기 | `01-LangGraph-Add-Memory.ipynb` | `InMemorySaver`, `thread_id`, 단기 메모리 |
+| | `02-LangGraph-Memory-Postgres.ipynb` | `PostgresSaver`, `PostgresStore` |
+| | `04-LangGraph-Agent-With-Memory.ipynb` | 장기 메모리 (Store) 와 에이전트 |
+| | `09-LangGraph-DeleteMessages.ipynb` | `RemoveMessage` 로 메시지 삭제 |
+| | `12-LangGraph-Add-Conversation-Summary.ipynb` | 대화 요약 (`SummarizationMiddleware`) |
+| Ch10. MCP 실습 | `01-LangGraph-MCP-Tutorial.ipynb` | `langchain.mcp` `MCPAdapter`, FastMCP 서버, stdio / Streamable HTTP, 다중 서버 |
 
-### 미들웨어와 컨텍스트
+### PART 04. 멀티에이전트
 
-6. **[langgraph-middleware.ipynb](langgraph-middleware.ipynb)**
-   - before_model, after_model 미들웨어
-   - wrap_model_call을 활용한 요청/응답 가로채기
-   - dynamic_prompt로 동적 시스템 프롬프트 생성
-   - 미들웨어 체이닝
+| 챕터 | 노트북 | 내용 |
+|:---|:---|:---|
+| Ch11. Supervisor | `01-LangGraph-Supervisor.ipynb`, `03-LangGraph-Multi-Agent-Supervisor.ipynb` | Supervisor 패턴, 서브에이전트 |
+| Ch12. 협업 네트워크 | `02-LangGraph-Multi-Agent-Collaboration.ipynb` | 에이전트 간 핸드오프 |
+| Ch13. 계층적 에이전트 팀 | `04-LangGraph-Hierarchial-Agent-Team.ipynb` | 계층적 팀 구성 |
 
-7. **[langgraph-runtime.ipynb](langgraph-runtime.ipynb)**
-   - Runtime 객체 구조 (Context, Store, Stream writer)
-   - Tool과 미들웨어에서 Runtime 접근
-   - 사용자 컨텍스트 관리
-   - 정적 설정과 동적 컨텍스트
+### PART 05. 핵심 기능 구현하기
 
-8. **[langgraph-context-engineering.ipynb](langgraph-context-engineering.ipynb)**
-   - Model Context 엔지니어링
-   - Tool Context 최적화
-   - Life-cycle Context 관리
-   - 상태 기반 동적 프롬프트와 Tool 선택
+| 챕터 | 노트북 | 내용 |
+|:---|:---|:---|
+| Ch14. Agent 구축 | `03-LangGraph-Agent.ipynb` | LangGraph 로 직접 에이전트 루프 구현 |
+| Ch15. 상태 수동 업데이트 | `07-LangGraph-Manual-State-Update.ipynb` | `update_state`, 중간 단계 개입 |
+| Ch16. 상태 커스터마이징 | `08-LangGraph-State-Customization.ipynb` | 커스텀 상태 스키마 |
+| Ch17. ToolNode | `10-LangGraph-ToolNode.ipynb` | `ToolNode`, `tools_condition` |
+| Ch18. 병렬 노드 실행 | `11-LangGraph-Branching.ipynb` | 분기와 팬아웃/팬인 |
+| Ch19. 서브그래프 | `13-LangGraph-Subgraph.ipynb` | 서브그래프 추가 및 사용 |
+| Ch20. 서브그래프 입출력 변환 | `14-LangGraph-Subgraph-Transform-State.ipynb` | 상태 변환 |
+| Ch21. 스트리밍 모드 | `03-LangGraph-Streaming.ipynb`, `05-LangGraph-Streaming-Outputs.ipynb`, `15-LangGraph-Streaming-Steps.ipynb` | `stream_mode`, 토큰 스트리밍, `astream_events` v2 / 이벤트 스트리밍 v3 |
+| Ch22. Agent Chat UI | `Agent-Chat-UI-OSS.ipynb` | `langgraph dev` + Agent Chat UI 배포 |
 
-### 스트리밍과 안전성
+### Appendix
 
-9. **[langgraph-streaming.ipynb](langgraph-streaming.ipynb)**
-   - Stream 모드: updates, messages, custom
-   - LLM 토큰 스트리밍
-   - get_stream_writer()를 활용한 커스텀 업데이트
-   - 실시간 진행 상황 보고
-
-10. **[langgraph-guardrails.ipynb](langgraph-guardrails.ipynb)**
-    - PII 탐지 및 보호 (이메일, 전화번호, 신용카드)
-    - Redact, Mask, Hash, Block 전략
-    - Human-in-the-Loop 미들웨어
-    - 커스텀 Guardrail 구현
-
-11. **[langgraph-human-in-the-loop.ipynb](langgraph-human-in-the-loop.ipynb)**
-    - 민감한 작업에 대한 사람의 승인
-    - Interrupt 설정 및 의사결정 (approve, edit, reject)
-    - Command 객체를 통한 재개
-    - 금융 및 고객 지원 시스템 예제
-
-### 고급 패턴
-
-12. **[langgraph-multi-agent.ipynb](langgraph-multi-agent.ipynb)**
-    - Tool Calling 패턴 (Supervisor + Subagents)
-    - Handoffs 패턴 (에이전트 전환)
-    - 계층적 에이전트 시스템
-    - 고객 지원 멀티에이전트 시스템
-
-13. **[langgraph-retrieval.ipynb](langgraph-retrieval.ipynb)**
-    - RAG (Retrieval-Augmented Generation) 패턴
-    - 2-Step RAG, Agentic RAG, Hybrid RAG
-    - Vector Store와 Retriever
-    - 지식 베이스 구축 및 Q&A 시스템
-
-14. **[langgraph-mcp.ipynb](langgraph-mcp.ipynb)**
-    - MCP (Model Context Protocol) 개요
-    - Transport 타입: stdio, HTTP, SSE
-    - FastMCP를 활용한 커스텀 서버 구현
-    - Stateful vs Stateless 세션
+| 폴더 | 내용 |
+|:---|:---|
+| `A-RAG응용/` | Naive RAG → Groundedness Check → Web Search → Query Rewrite → Agentic / Corrective / Self / Adaptive RAG |
+| `B-Use-Cases/` | Agent Simulation, Prompt Generation, Plan-and-Execute, SQL Agent, Research Assistant |
+| `C-GraphRAG/` | Neo4j Text2Cypher (GraphRAG) |
 
 ## 시작하기
 
 ### 1. 저장소 클론
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/braincrew-lab/langgraph-v1-tutorial.git
 cd langgraph-v1-tutorial
 ```
 
 ### 2. 환경 설정
 
-위의 [환경 설정](#환경-설정) 섹션을 따라 UV를 설치하고 의존성을 설치합니다.
+위의 [환경 설정](#환경-설정) 섹션을 따라 UV를 설치하고 `uv sync` 로 의존성을 설치합니다.
 
-### 3. Jupyter Notebook 실행
+### 3. Jupyter 실행
 
 ```bash
-# Jupyter Lab 설치 (선택사항)
-uv pip install jupyterlab
-
-# Jupyter Lab 실행
-jupyter lab
+uv run jupyter lab
 ```
 
-또는 VS Code의 Jupyter 확장을 사용할 수 있습니다.
+또는 VS Code의 Jupyter 확장을 사용할 수 있습니다. (커널로 `.venv` 를 선택하세요.)
 
-### 4. 튜토리얼 순서
+### 4. 권장 학습 순서
 
-다음 순서로 학습하는 것을 권장합니다:
-
-**입문:**
-1. langgraph-messages.ipynb
-2. langgraph-tools.ipynb
-3. langgraph-structured-output.ipynb
-
-**메모리 관리:**
-4. langgraph-short-term-memory.ipynb
-5. langgraph-long-term-memory.ipynb
-
-**미들웨어:**
-6. langgraph-middleware.ipynb
-7. langgraph-runtime.ipynb
-8. langgraph-context-engineering.ipynb
-
-**고급 기능:**
-9. langgraph-streaming.ipynb
-10. langgraph-guardrails.ipynb
-11. langgraph-human-in-the-loop.ipynb
-
-**실전 패턴:**
-12. langgraph-multi-agent.ipynb
-13. langgraph-retrieval.ipynb
-14. langgraph-mcp.ipynb
+PART 01 → PART 02 → PART 03 → PART 04 → PART 05 → Appendix 순서로 진행하는 것을 권장합니다.
 
 ## 필수 요구사항
 
-- **Python**: 3.9 이상
+- **Python**: 3.11 이상 (`.python-version` 참고)
 - **API Keys**:
-  - OpenAI API Key (GPT-4 모델 사용)
-  - Anthropic API Key (Claude 모델 사용, 선택사항)
+  - Anthropic API Key (기본 모델 `claude-sonnet-5`)
+  - OpenAI API Key (OpenAI 모델 사용 시)
+  - Tavily API Key (웹 검색 실습)
+  - LangSmith API Key (추적, 선택사항)
 - **기본 지식**:
   - Python 프로그래밍 기초
   - 비동기 프로그래밍 개념 (async/await)
@@ -224,34 +198,29 @@ jupyter lab
 
 ```
 langgraph-v1-tutorial/
-├── README.md                              # 프로젝트 문서
-├── .env.example                           # 환경 변수 템플릿
-├── .env                                   # 환경 변수 (gitignore)
-├── pyproject.toml                         # 프로젝트 설정 및 의존성
-├── uv.lock                                # 의존성 잠금 파일
-│
-├── langgraph-messages.ipynb               # 메시지 구조
-├── langgraph-tools.ipynb                  # Tool 정의와 사용
-├── langgraph-structured-output.ipynb      # 구조화된 출력
-├── langgraph-short-term-memory.ipynb      # 단기 메모리
-├── langgraph-long-term-memory.ipynb       # 장기 메모리
-├── langgraph-middleware.ipynb             # 미들웨어
-├── langgraph-runtime.ipynb                # Runtime 객체
-├── langgraph-context-engineering.ipynb    # 컨텍스트 엔지니어링
-├── langgraph-streaming.ipynb              # 스트리밍
-├── langgraph-guardrails.ipynb             # 보안 및 안전장치
-├── langgraph-human-in-the-loop.ipynb      # 사람의 개입
-├── langgraph-multi-agent.ipynb            # 멀티에이전트 시스템
-├── langgraph-retrieval.ipynb              # RAG 패턴
-└── langgraph-mcp.ipynb                    # Model Context Protocol
+├── README.md
+├── .env.example
+├── pyproject.toml                 # 의존성 정의
+├── uv.lock                        # 의존성 잠금 파일
+├── assets/                        # 공용 이미지
+├── data/                          # 실습 데이터
+├── PART01-LangGraph-기초/
+├── PART02-에이전트/
+├── PART03-에이전트-확장/
+│   └── Ch10-LangGraph-MCP-실습/server/   # FastMCP 서버 예제
+├── PART04-멀티에이전트/
+├── PART05-핵심-기능-구현하기/
+└── Appendix/
 ```
 
 ## 참고 자료
 
 ### 공식 문서
-- [LangChain Documentation](https://docs.langchain.com/)
-- [LangGraph Documentation](https://langchain-ai.github.io/langgraph/)
-- [LangChain Python API Reference](https://api.python.langchain.com/)
+- [LangChain / LangGraph Documentation](https://docs.langchain.com/)
+- [LangGraph (Python) 가이드](https://docs.langchain.com/oss/python/langgraph/overview)
+- [LangChain (Python) 가이드](https://docs.langchain.com/oss/python/langchain/overview)
+- [LangChain Python API Reference](https://reference.langchain.com/python/)
+- [FastMCP Documentation](https://gofastmcp.com/)
 
 ### 관련 리소스
 - [OpenAI API Documentation](https://platform.openai.com/docs)

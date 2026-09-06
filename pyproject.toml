@@ -1,49 +1,58 @@
 [project]
 name = "langgraph-v1-tutorial"
-version = "0.2.0"
+version = "0.3.0"
 description = "Ultimate LangGraph Tutorial written in Korean"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     # LangChain Core
-    "langchain>=1.2.13",
-    "langchain-community>=0.4.1",
-    "langchain-experimental>=0.4.1",
-    "langchain-text-splitters>=1.1.1",
+    # langchain[mcp] pulls in FastMCP for the built-in `langchain.mcp` namespace (MCPAdapter)
+    "langchain[mcp]>=1.4.0",
+    "langchain-community>=0.4.2",
+    "langchain-experimental>=0.4.2",
+    "langchain-text-splitters>=1.1.2",
     # LangChain Integrations
-    "langchain-anthropic>=1.4.0",
-    "langchain-mcp-adapters>=0.2.2",
-    "langchain-neo4j>=0.3.0,<0.8.0",
-    "langchain-ollama>=1.0.1",
-    "langchain-openai>=1.1.12",
-    "langchain-tavily>=0.2.17",
+    "langchain-anthropic>=1.7.1",
+    "langchain-neo4j>=0.10.0",  # requires neo4j-graphrag -> pinecone (see [tool.uv] override below)
+    "langchain-ollama>=1.1.0",
+    "langchain-openai>=1.6.0",
+    "langchain-tavily>=0.2.18",
     "langchain-teddynote>=0.5.4",
     # LangGraph
-    "langgraph>=1.1.3",
-    "langgraph-checkpoint-postgres>=3.0.5",
-    "langgraph-checkpoint-redis>=0.4.0",
-    "langgraph-cli[inmem]>=0.4.19",
+    "langgraph>=1.2.11",
+    "langgraph-checkpoint-postgres>=3.1.2",
+    "langgraph-checkpoint-redis>=0.5.2",
+    "langgraph-cli[inmem]>=0.4.31",
     "langgraph-supervisor>=0.0.31",
     # Deep Agents
-    "deepagents>=0.4.12",
-    # MCP
-    "mcp>=1.26.0",
+    "deepagents>=0.7.13",
+    # MCP (FastMCP 4 server framework + MCP Python SDK 2.x)
+    "fastmcp>=4.0.3",
+    "mcp>=2.1.1",
     # Data Science & Visualization
-    "matplotlib>=3.10.8",
-    "pandas>=3.0.1",
-    "scikit-learn>=1.8.0",
+    "matplotlib>=3.11.1",
+    "pandas>=3.0.5",
+    "scikit-learn>=1.9.0",
     "seaborn>=0.13.2",
     # Database & Storage
-    "faiss-cpu>=1.13.2",
-    "neo4j>=6.1.0",
-    "psycopg2-binary>=2.9.11",
-    "psycopg[binary,pool]>=3.3.3",
+    "faiss-cpu>=1.15.0",
+    "pinecone>=7.0.0",
+    "neo4j>=6.3.0",
+    "psycopg2-binary>=2.9.12",
+    "psycopg[binary,pool]>=3.3.5",
     # Document Processing
-    "arxiv>=2.4.1",
-    "pdfplumber>=0.11.9",
-    "pymupdf>=1.27.2.2",
+    "arxiv>=4.0.1",
+    "pdfplumber>=0.11.10",
+    "pymupdf>=1.28.2",
     # Development Tools
     "jupyter>=1.1.1",
-    "notebook>=7.5.5",
-    "python-dotenv>=1.2.2",
+    "notebook>=7.6.2",
+    "python-dotenv>=1.2.3",
 ]
+
+[tool.uv]
+# langchain-teddynote still declares the retired `pinecone-client` package, which now ships as a
+# tombstone that raises on import. Drop it so the official `pinecone` package (needed by
+# neo4j-graphrag / langchain-neo4j >= 0.8) can be imported. See:
+# https://github.com/pinecone-io/pinecone-python-client
+override-dependencies = ["pinecone-client ; python_version < '0'"]

@@ -2,7 +2,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from dotenv import load_dotenv
 from typing import Any
 from rag.pdf import PDFRetrievalChain
@@ -39,7 +39,7 @@ mcp = FastMCP(
 )
 
 
-@mcp.tool()
+@mcp.tool
 async def retrieve(query: str) -> str:
     """쿼리를 기반으로 문서 데이터베이스에서 정보를 검색합니다.
 

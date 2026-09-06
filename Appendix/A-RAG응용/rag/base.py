@@ -14,7 +14,7 @@ class RetrievalChain(ABC):
     def __init__(self):
         self.source_uri = None
         self.k = 8
-        self.model_name = "claude-sonnet-4-5"  # OpenAI 키 사용 시 gpt-4.1-mini 등으로 변경
+        self.model_name = "claude-sonnet-5"  # OpenAI 키 사용 시 gpt-5.4-mini 등으로 변경
         self.temperature = 0
         self.prompt = "teddynote/rag-prompt"
         self.embeddings = "text-embedding-3-small"
@@ -103,7 +103,7 @@ class RetrievalChain(ABC):
 
     def create_model(self):
         # LangChain v1 방식: init_chat_model로 모델 초기화
-        # OpenAI 키 사용 시 gpt-4.1-mini 등으로 변경
+        # OpenAI 키 사용 시 gpt-5.4-mini 등으로 변경
         return init_chat_model(self.model_name, temperature=self.temperature)
 
     def create_prompt(self):

@@ -1,4 +1,4 @@
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import PyMuPDFLoader
@@ -53,7 +53,7 @@ def initialize_vector_store():
     return vector_store
 
 
-@mcp.tool()
+@mcp.tool
 async def vector_search(
     query: str,
     search_type: Literal["semantic", "keyword", "hybrid"] = "semantic",
@@ -92,7 +92,7 @@ async def vector_search(
     return "\n\n".join([doc.page_content for doc in results])
 
 
-@mcp.tool()
+@mcp.tool
 async def add_document(text: str, metadata: dict = None) -> str:
     """사용자 텍스트를 벡터 스토어에 추가합니다.
 
@@ -129,7 +129,7 @@ async def add_document(text: str, metadata: dict = None) -> str:
     return f"문서가 성공적으로 추가되었습니다. 총 {len(text)} 문자, {len(splits)}개 청크로 분할됨"
 
 
-@mcp.tool()
+@mcp.tool
 async def web_search(query: str, max_results: int = 3) -> str:
     """TavilySearch를 사용하여 웹 검색을 수행합니다.
 
