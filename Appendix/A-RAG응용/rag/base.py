@@ -14,7 +14,7 @@ class RetrievalChain(ABC):
     def __init__(self):
         self.source_uri = None
         self.k = 8
-        self.model_name = "gpt-5.4"  # 다른 모델을 사용하려면 gpt-5.4-mini, claude-sonnet-5 등으로 변경
+        self.model_name = "gpt-5.6-terra"  # 모델 등급: gpt-5.6-sol(high) / gpt-5.6-terra(medium) / gpt-5.6-luna(low)
         self.temperature = 0
         self.prompt = "teddynote/rag-prompt"
         self.embeddings = "text-embedding-3-small"
@@ -103,12 +103,13 @@ class RetrievalChain(ABC):
 
     def create_model(self):
         # LangChain v1 방식: init_chat_model로 모델 초기화
-        # 다른 모델을 사용하려면 gpt-5.4-mini, claude-sonnet-5 등으로 변경
-        return init_chat_model(self.model_name, temperature=self.temperature)
+        # 모델 등급: gpt-5.6-sol(high) / gpt-5.6-terra(medium) / gpt-5.6-luna(low)
+        return init_chat_model(self.model_name, reasoning_effort="none", temperature=self.temperature)
 
     def create_prompt(self):
         # LangSmith Client를 사용하여 프롬프트 로드
-        return Client().pull_prompt(self.prompt)
+        # langsmith>=0.8: 공개 프롬프트(owner/name) 를 가져오려면 명시적 동의 플래그가 필요합니다
+        return Client().pull_prompt(self.prompt, dangerously_pull_public_prompt=True)
 
     def create_chain(self):
         docs = self.load_documents(self.source_uri)

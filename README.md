@@ -68,7 +68,7 @@ TAVILY_API_KEY=
 
 ### 4. 기본 모델
 
-실습 코드는 기본적으로 OpenAI `gpt-5.4` 를 사용합니다 (`init_chat_model("gpt-5.4")`). 다른 모델을 사용하려면 `gpt-5.4-mini`, `anthropic:claude-sonnet-5` 등으로 바꿔 실행할 수 있습니다. (Ollama 로컬 모델 예제는 `PART02/Ch02/03-QuickStart-LangGraph-Ollama.ipynb` 를 참고하세요.)
+실습 코드는 기본적으로 OpenAI `gpt-5.6-terra` 를 사용합니다 (`init_chat_model("gpt-5.6-terra")`). 모델 등급은 `gpt-5.6-sol`(high) / `gpt-5.6-terra`(medium) / `gpt-5.6-luna`(low) 이며, 대부분의 실습은 medium 또는 low 등급을 사용합니다. gpt-5.6 계열은 Chat Completions API 에서 추론이 켜진 상태로 함수 도구를 쓸 수 없으므로, 실습 코드는 `reasoning_effort="none"` 으로 모델을 생성합니다 (자세한 설명은 `PART01/Ch01/01-LangGraph-Models.ipynb`). (Ollama 로컬 모델 예제는 `PART02/Ch02/03-QuickStart-LangGraph-Ollama.ipynb` 를 참고하세요.)
 
 ## 사용 라이브러리 버전
 
@@ -185,7 +185,7 @@ PART 01 → PART 02 → PART 03 → PART 04 → PART 05 → Appendix 순서로 �
 
 - **Python**: 3.11 이상 (`.python-version` 참고)
 - **API Keys**:
-  - OpenAI API Key (기본 모델 `gpt-5.4`)
+  - OpenAI API Key (기본 모델 `gpt-5.6-terra`)
   - Anthropic API Key (Claude 모델 사용 시, 선택사항)
   - Tavily API Key (웹 검색 실습)
   - LangSmith API Key (추적, 선택사항)
