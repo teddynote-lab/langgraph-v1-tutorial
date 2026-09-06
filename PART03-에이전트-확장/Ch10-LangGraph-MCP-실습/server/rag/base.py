@@ -14,8 +14,8 @@ class RetrievalChain(ABC):
     def __init__(self):
         self.source_uri = None
         self.k = 8
-        # OpenAI 키 사용 시 gpt-5.5, gpt-5.4-mini 등으로 변경 가능
-        self.model_name = "claude-sonnet-5"
+        # 다른 모델을 사용하려면 gpt-5.4-mini, claude-sonnet-5 등으로 변경 가능
+        self.model_name = "gpt-5.4"
         self.temperature = 0
         self.prompt = "teddynote/rag-prompt"
         self.embeddings = "text-embedding-3-small"
