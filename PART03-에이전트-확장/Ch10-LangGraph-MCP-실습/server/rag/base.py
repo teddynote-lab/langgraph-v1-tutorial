@@ -14,8 +14,8 @@ class RetrievalChain(ABC):
     def __init__(self):
         self.source_uri = None
         self.k = 8
-        # 다른 모델을 사용하려면 gpt-5.4-mini, claude-sonnet-5 등으로 변경 가능
-        self.model_name = "gpt-5.4"
+        # 모델 등급: gpt-5.6-sol(high) / gpt-5.6-terra(medium) / gpt-5.6-luna(low)
+        self.model_name = "gpt-5.6-terra"
         self.temperature = 0
         self.prompt = "teddynote/rag-prompt"
         self.embeddings = "text-embedding-3-small"
@@ -103,10 +103,11 @@ class RetrievalChain(ABC):
         return dense_retriever
 
     def create_model(self):
-        return init_chat_model(self.model_name, temperature=self.temperature)
+        return init_chat_model(self.model_name, reasoning_effort="none", temperature=self.temperature)
 
     def create_prompt(self):
-        return Client().pull_prompt(self.prompt)
+        # langsmith>=0.8: 공개 프롬프트(owner/name) 를 가져오려면 명시적 동의 플래그가 필요합니다
+        return Client().pull_prompt(self.prompt, dangerously_pull_public_prompt=True)
 
     def create_chain(self):
         docs = self.load_documents(self.source_uri)

@@ -6,7 +6,7 @@ from langchain_teddynote.tools.tavily import TavilySearch
 load_dotenv(override=True)
 
 # 모델 초기화
-model = init_chat_model("gpt-5.4")
+model = init_chat_model("gpt-5.6-terra", reasoning_effort="none")
 
 # 도구 정의: Tavily 검색 도구
 tools = [TavilySearch(max_results=3)]
