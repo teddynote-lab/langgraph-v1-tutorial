@@ -68,7 +68,7 @@ TAVILY_API_KEY=
 
 ### 4. 기본 모델
 
-실습 코드는 기본적으로 Anthropic `claude-sonnet-5` 를 사용합니다. OpenAI 키를 사용하는 경우 `init_chat_model("gpt-5.5")` 또는 `init_chat_model("gpt-5.4-mini")` 등으로 바꿔 실행할 수 있습니다. (Ollama 로컬 모델 예제는 `PART02/Ch02/03-QuickStart-LangGraph-Ollama.ipynb` 를 참고하세요.)
+실습 코드는 기본적으로 OpenAI `gpt-5.4` 를 사용합니다 (`init_chat_model("gpt-5.4")`). 다른 모델을 사용하려면 `gpt-5.4-mini`, `anthropic:claude-sonnet-5` 등으로 바꿔 실행할 수 있습니다. (Ollama 로컬 모델 예제는 `PART02/Ch02/03-QuickStart-LangGraph-Ollama.ipynb` 를 참고하세요.)
 
 ## 사용 라이브러리 버전
 
@@ -185,8 +185,8 @@ PART 01 → PART 02 → PART 03 → PART 04 → PART 05 → Appendix 순서로 �
 
 - **Python**: 3.11 이상 (`.python-version` 참고)
 - **API Keys**:
-  - Anthropic API Key (기본 모델 `claude-sonnet-5`)
-  - OpenAI API Key (OpenAI 모델 사용 시)
+  - OpenAI API Key (기본 모델 `gpt-5.4`)
+  - Anthropic API Key (Claude 모델 사용 시, 선택사항)
   - Tavily API Key (웹 검색 실습)
   - LangSmith API Key (추적, 선택사항)
 - **기본 지식**:
